@@ -22,6 +22,10 @@ public:
   */
   PID();
 
+  PID(double Kp, double Ki, double Kd) {
+  	Init(Kp, Ki, Kd);
+  };
+
   /*
   * Destructor.
   */
