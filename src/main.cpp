@@ -32,7 +32,7 @@ int main()
 {
   uWS::Hub h;
 
-  PID pid_steer(0.1, 0.0005, 1.);
+  PID pid_steer(0.07, 0.002, 1.7);
   PID pid_speed(0.1, 0.0005, 1.);
 
   h.onMessage([&pid_steer, &pid_speed](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -51,21 +51,20 @@ int main()
           double speed = std::stod(j[1]["speed"].get<std::string>());
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
 		  
-          pid_steer.UpdateError(cte);
-          double steer_value = pid_steer.TotalError();
-
-		  // Speed is between 10 and 50 mph depending on how steep the steering angle is
-		  double target_speed = 40. * (1. - abs(steer_value)) + 10.;
-
-          pid_speed.UpdateError(speed - target_speed);
-          double speed_value = pid_speed.TotalError();
-
           /*
           * TODO: Calcuate steering value here, remember the steering value is
           * [-1, 1].
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
           */
+          pid_steer.UpdateError(cte);
+          double steer_value = pid_steer.TotalError();
+
+		  // The target speed should be between 10 and 50 mph depending on the steering angle
+		  double target_speed = 40. * (1. - abs(steer_value)) + 10.;
+
+          pid_speed.UpdateError(speed - target_speed);
+          double speed_value = pid_speed.TotalError();
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
