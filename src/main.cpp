@@ -32,7 +32,7 @@ int main()
 {
   uWS::Hub h;
 
-  PID pid_steer(0.14179, 0.00941, 1.9438); //was 0.07, 0.002, 1.7 when tuning manually
+  PID pid_steer(0.14288, 0.0135933, 1.8552); //was 0.07, 0.002, 1.7 when tuning manually
   PID pid_speed(0.1,  0.001, 1.);
   pid_steer.ActivateTwiddle(0.01, 0.001, 0.1, 1e-5, 710);
 
