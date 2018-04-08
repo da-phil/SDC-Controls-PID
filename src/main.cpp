@@ -32,8 +32,10 @@ int main()
 {
   uWS::Hub h;
 
-  PID pid_steer(0.07, 0.002, 1.7);
-  PID pid_speed(0.1, 0.0005, 1.);
+  // PID pid_steer(0.10189, 0.00531, 2.0189); //was 0.07, 0.002, 1.7 before
+  PID pid_steer(0.13179, 0.00841, 2.2079); 
+  PID pid_speed(0.1,  0.001, 1.);
+  pid_steer.ActivateTwiddle(0.01, 0.001, 0.1, 1e-5, 710);
 
   h.onMessage([&pid_steer, &pid_speed](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -60,20 +62,23 @@ int main()
           pid_steer.UpdateError(cte);
           double steer_value = pid_steer.TotalError();
 
-		  // The target speed should be between 10 and 50 mph depending on the steering angle
-		  double target_speed = 40. * (1. - abs(steer_value)) + 10.;
+		  // The target speed should be between 10 and 40 mph depending on the steering angle
+		  double target_speed = 30. * (1. - abs(steer_value)) + 10.;
 
           pid_speed.UpdateError(speed - target_speed);
           double speed_value = pid_speed.TotalError();
           
           // DEBUG
+          /*
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
-
+          std::cout << "Steering RMSE: " << pid_steer.GetRMSE() << ", ";
+          std::cout << "Speed RMSE: " << pid_speed.GetRMSE() << std::endl;
+          std::cout << "sample_count: " << pid_steer.sample_count << std::endl;
+          */
           json msgJson;
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = speed_value;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {
