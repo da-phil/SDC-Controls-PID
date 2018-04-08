@@ -1,7 +1,4 @@
-# CarND-Controls-PID
-Self-Driving Car Engineer Nanodegree Program
-
----
+# Implementation of simple PID control 
 
 ## Dependencies
 
@@ -37,62 +34,18 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 
 Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
 
-## Editor Settings
+## Implementation
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+The implementation of the PID controller was straight forward, the function `void PID::UpdateError(double cte)` takes the current control error for calcuating the internal error gains and the function `double PID::TotalError()` returns the resulting control error value.
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+One instance of the PID class controls the steering, where the cross-tack-error (CTE) is being used as error value and the other PID instance controls the speed of the car by using the a target speed range between 10 and 40 mph, depending on the steering output, increasing speed at lower steering angles and decreasing for high steering angles, just like this: `target_speed = 30. * (1. - abs(steer_value)) + 10.`
 
-## Code Style
+For tuning the PID gains I started out with `0.1, 0.0005, 1.0` (P,I,D) and refined the parameters manually to `0.07, 0.002, 1.7`.
+Good guidelines on how to tune PID parameters are:
+- https://en.wikipedia.org/wiki/Controller_(control_theory)
+- https://www.embedded.com/design/prototyping-and-development/4211211/PID-without-a-PhD
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+After manually tuning the PID parameters I implemented twiddle ([used in class](https://www.youtube.com/watch?v=2uQ2BSzDvXs)) in order to optimize the PID parameters in respect to the RMSE over a lap on the racing course.
 
-## Project Instructions and Rubric
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
-
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/e8235395-22dd-4b87-88e0-d108c5e5bbf4/concepts/6a4d8d42-6a04-4aa6-b284-1697c0fd6562)
-for instructions and the project rubric.
-
-## Hints!
-
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
-
-## Call for IDE Profiles Pull Requests
-
-Help your fellow students!
-
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
-
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+Even after tuning the PID parameters carefully the car drives safe but very shacky, presumably a real passenger would throw up after only one lap already! I'm already curious on how model predictive control improves this situation ;)
 
